@@ -389,6 +389,7 @@ public abstract class Request {
         MAPPER.addMixInAnnotations(UpdateItemRequest.class, RequestMixIn.class);
         MAPPER.addMixInAnnotations(DeleteItemRequest.class, RequestMixIn.class);
         MAPPER.addMixInAnnotations(AttributeValueUpdate.class, AttributeValueUpdateMixIn.class);
+        MAPPER.addMixInAnnotations(ExpectedAttributeValue.class, ExpectedAttributeValueMixIn.class);
         
         // Deal with serializing of byte[].
         SimpleModule module = new SimpleModule("custom", Version.unknownVersion());
@@ -424,7 +425,12 @@ public abstract class Request {
             throw new TransactionAssertionException(txId, "Failed to deserialize request " + rawRequest + " " + e);
         }
     }
-    
+
+    private static abstract class ExpectedAttributeValueMixIn {
+        @JsonIgnore 
+        public abstract void setComparisonOperator(String comparisonOperator);
+    }
+
     private static abstract class AmazonWebServiceRequestMixIn {
 
         @JsonIgnore
@@ -444,7 +450,9 @@ public abstract class Request {
 
         @JsonIgnore
         public abstract RequestClientOptions getRequestClientOptions();
-        
+
+        @JsonIgnore 
+        public abstract void setConditionalOperator(String conditionalOperator);
     }
     
     private static abstract class RequestMixIn extends AmazonWebServiceRequestMixIn {
